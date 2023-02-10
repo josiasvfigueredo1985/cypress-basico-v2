@@ -16,15 +16,19 @@ describe('Central de Atendimento ao Cliente TAT', function () {
         cy.title().should('be.equal', 'Central de Atendimento ao Cliente TAT')
     })
     it('preenche os campos obrigatórios e envia o formulário', () => {
-        const longText = 'Este é um teste executado utilizando Cypress! Este texto é apenas uma amostra de digitação da ferramenta de automação Cypress'
+        const longText = Cypress._.repeat('Cypress Tests ', 20)
+        cy.clock()
         cy.get('#firstName').should('be.visible').type('Josias', { delay: 0 })
         cy.get('#lastName').should('be.visible').type('Valentim', { delay: 0 })
         cy.get('#email').should('be.visible').type('josiasvalentim@gmail.com', { delay: 0 })
         cy.get('#open-text-area').should('be.visible').type(longText, { delay: 0 })
         cy.contains('button[type="submit"]', 'Enviar').should('be.visible').click()
         cy.get('.success').should('be.visible')
+        cy.tick(3000)
+        cy.get('.success').should('not.be.visible')
     })
     it('exibe mensagem de erro ao submeter o formulário com um email com formatação inválida', () => {
+        cy.clock() // Freeze the browser clock
         cy.get('#firstName').should('be.visible').type('Josias', { delay: 0 })
         cy.get('#lastName').should('be.visible').type('Valentim', { delay: 0 })
         cy.get('#email').should('be.visible').type('josiasvalentimgmail.com', { delay: 0 })
@@ -32,6 +36,8 @@ describe('Central de Atendimento ao Cliente TAT', function () {
         cy.get('#open-text-area').should('be.visible').type('Este é um teste executado utilizando Cypress!', { delay: 0 })
         cy.contains('.button', 'Enviar').should('be.visible').click()
         cy.get('.error').should('be.visible')
+        cy.tick(3000)// Move forward 3 seconds
+        cy.get('.error').should('not.be.visible')
     });
     it('digita alfanumérico no campo de telefone', () => {
         cy.get('#phone').should('be.visible').type('teste01telefone', { delay: 0 }).should('be.empty')
@@ -158,7 +164,6 @@ describe('Central de Atendimento ao Cliente TAT', function () {
                 expect(input[0].files[1].name).to.eql('example.txt')
             })
     });
-    // This is´nt working anymore, waiting for the response from Walmyr
     it('selecione múltiplos arquivos para upload simulando drag and drop', () => {
         cy.get('input[type="file"]')
             .selectFile([
@@ -174,13 +179,87 @@ describe('Central de Atendimento ao Cliente TAT', function () {
     it('verifica que a política de privacidade abre em outra aba sem a necessidade de um clique', () => {
         cy.get('#privacy a').should('have.attr', 'target', '_blank')
     });
-    it('acessa a página da política de privacidade removendo o target e então clicando no link', () => {
-        cy.get('a[href="privacy.html"]')
-            .invoke('removeAttr', 'target').
-            click()
-            .title().should('be.equal', 'Central de Atendimento ao Cliente TAT - Política de privacidade')
-        cy.contains('Talking About Testing')
+
+    Cypress._.times(5, () => {// Run the tests 5 times
+        it('acessa a página da política de privacidade removendo o target e então clicando no link', () => {
+            cy.get('a[href="privacy.html"]')
+                .invoke('removeAttr', 'target').
+                click()
+                .title().should('be.equal', 'Central de Atendimento ao Cliente TAT - Política de privacidade')
+            cy.contains('Talking About Testing')
+                .should('be.visible')
+        });
+    })
+
+    it('exibe e esconde as mensagens de sucesso e erro usando o .invoke()', () => {
+        cy.get('.success')
+            .should('not.be.visible')
+            .invoke('show')
             .should('be.visible')
+            .and('contain', 'Mensagem enviada com sucesso.')
+            .invoke('hide')
+            .should('not.be.visible')
+        cy.get('.error')
+            .should('not.be.visible')
+            .invoke('show')
+            .should('be.visible')
+            .and('contain', 'Valide os campos obrigatórios!')
+            .invoke('hide')
+            .should('not.be.visible')
+    });
+    it('preenche a area de texto usando o comando invoke', () => {
+        const longText = Cypress._.repeat('0123456789', 20)
+
+        cy.get('#open-text-area')
+            .invoke('val', longText)
+            .should('have.value', longText)
+    });
+})
+
+describe('Teste de API - ServRest', () => {
+    it('busca usuários corretamente', () => {
+        cy.request({
+            method: 'GET',
+            url: 'https://serverest.dev/usuarios'
+        }).then((response) => {
+            //console.log(response)
+            expect(response.status).to.equal(200);
+            expect(response.body.usuarios[0].nome).to.equal('Fulano da Silva')
+            expect(response.body.usuarios[0].email).to.equal('fulano@qa.com')
+        })
+    })
+    it('faz uma requisição HTTP', () => {
+        cy.request({
+            method: 'GET',
+            url: 'https://cac-tat.s3.eu-central-1.amazonaws.com/index.html'
+        }).then((response) => {
+            //console.log(response)
+            expect(response.status).to.equal(200)
+            expect(response.statusText).to.equal('OK');
+            expect(response.body).to.contain('Central de Atendimento ao Cliente TAT')
+        })
     });
 
-}) 
+    it('faz uma requisição HTTP - Deserializando a response', () => {
+        cy.request({
+            method: 'GET',
+            url: 'https://cac-tat.s3.eu-central-1.amazonaws.com/index.html'
+        }).then((response) => {
+            //console.log(response)
+            const { status, statusText, body } = response
+            expect(status).to.equal(200)
+            expect(statusText).to.equal('OK');
+            expect(body).to.contain('Central de Atendimento ao Cliente TAT')
+            expect(body).to.include('CAC TAT')
+        })
+    });
+})
+
+describe('Desafio (encontre o gato) 🐈', () => {
+    it.only('encontrar o gato e demonstrar que ele está visível.', () => {
+        cy.visit('src/index.html')
+        cy.get('#cat').invoke('show').should('be.visible')
+        cy.get('#title').invoke('text', 'CAT TAT').should('be.visible')
+        cy.get('#subtitle').invoke('text', 'Eu 😻😍 🐈🐈🐈🐈🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛')
+    });
+});
