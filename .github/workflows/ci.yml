@@ -9,4 +9,4 @@ jobs:
     - name: Cypress run
       # Install NPM dependencies, cache them correctly
       # and run all Cypress tests
-      uses: cypress-io/github-action@v5.x.x
+      uses: cypress-io/github-action@v5
