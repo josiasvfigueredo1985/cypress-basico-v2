@@ -256,7 +256,7 @@ describe('Teste de API - ServRest', () => {
 })
 
 describe('Desafio (encontre o gato) 🐈', () => {
-    it.only('encontrar o gato e demonstrar que ele está visível.', () => {
+    it('encontrar o gato e demonstrar que ele está visível.', () => {
         cy.visit('src/index.html')
         cy.get('#cat').invoke('show').should('be.visible')
         cy.get('#title').invoke('text', 'CAT TAT').should('be.visible')
