@@ -159,7 +159,7 @@ describe('Central de Atendimento ao Cliente TAT', function () {
             })
     });
     // This is´nt working anymore, waiting for the response from Walmyr
-    it.skip('selecione múltiplos arquivos para upload simulando drag and drop', () => {
+    it('selecione múltiplos arquivos para upload simulando drag and drop', () => {
         cy.get('input[type="file"]')
             .selectFile([
                 'cypress/fixtures/example.json',
@@ -174,7 +174,7 @@ describe('Central de Atendimento ao Cliente TAT', function () {
     it('verifica que a política de privacidade abre em outra aba sem a necessidade de um clique', () => {
         cy.get('#privacy a').should('have.attr', 'target', '_blank')
     });
-    it('acessa a página da política de privacidade removendo o target e então clicando no link', () => {
+    it.only('acessa a página da política de privacidade removendo o target e então clicando no link', () => {
         cy.get('a[href="privacy.html"]')
             .invoke('removeAttr', 'target').
             click()
