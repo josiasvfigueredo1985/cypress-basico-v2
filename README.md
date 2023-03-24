@@ -88,4 +88,4 @@ ___
 3- Para melhor funcionamento das integrações entre o código e a escrita, é recomendada a extensão Intellicode
 ___
 
-# Feito com ❤️ por Josias
+Feito com ❤️ por Josias
