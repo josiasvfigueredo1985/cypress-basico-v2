@@ -1,5 +1,5 @@
 {
-  "pluginsFile": false,
+  "pluginsFile": "cypress/custom-plugins/index.js",
   "viewportHeight": 880,
   "viewportWidth": 1280,
   "projectId": "ow29pt"
