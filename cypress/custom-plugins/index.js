@@ -8,11 +8,15 @@ export default (on, config) => {
             const directoryPath = './cypress/fixtures/not_encrypted/example.json';
             const fileData = cryptoHandler.readJsonFile(directoryPath);
             console.log('Retorno texto plano:\n', fileData)
-            const encryptedData = await cryptoHandler.encryptString(fileData, password);
+            //const encryptedData = await cryptoHandler.encryptString(fileData, password);
+            const encryptedData = await cryptoHandler.readTextFile('./cypress/fixtures/example-encrypted.txt');
             console.log('Retorno encriptado:\n', encryptedData)
-            cryptoHandler.saveEncryptedData('./cypress/fixtures/example-encrypted.txt', encryptedData);
+            // cryptoHandler.saveEncryptedData('./cypress/fixtures/example-encrypted.txt', encryptedData);
             const decrypted = cryptoHandler.decryptString(encryptedData, password)
-            return decrypted;
+            console.log('Retorno decriptado:\n', decrypted)
+            const obj = JSON.parse(decrypted)
+            console.log('Retorno json:\n', obj)
+            return obj;
         }
     });
 };

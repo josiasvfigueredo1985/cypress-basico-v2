@@ -1,14 +1,14 @@
 
 describe.only('Test Crypt file', () => {
-    let str = null
+    let obj = null
     before(() => {
         cy.task('readEncryptedData').then((jsonString) => {
-            str = jsonString
+            obj = jsonString
         });
     });
 
     it.only('should read encrypted fixture', () => {
-        expect(str).to.include('hello@cypress.io');
+        expect(obj.email).to.eq('hello@cypress.io');
     });
 
 });

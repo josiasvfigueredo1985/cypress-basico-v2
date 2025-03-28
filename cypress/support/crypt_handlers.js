@@ -22,35 +22,39 @@ export class CryptoHandler {
         return plainText;
     }
 
+    readTextFile(filePath) {
+        const textData = fs.readFileSync(filePath, 'utf8');
+        return textData;
+    }
+
     encryptString(textData, password) {
         return new Promise((resolve, reject) => {
-            // First, we'll generate the key. The key length is dependent on the algorithm.
-            // In this case for aes192, it is 24 bytes (192 bits).
             scrypt(password, 'salt', 24, (err, key) => {
                 if (err) return reject(err);
-                // Then, we'll generate a random initialization vector
-                randomFill(new Uint8Array(16), (err, iv) => {
+                randomFill(Buffer.alloc(16), (err, iv) => {
                     if (err) return reject(err);
                     const cipher = createCipheriv(algorithm, key, iv);
                     let encrypted = cipher.update(textData, 'utf8', 'hex');
                     encrypted += cipher.final('hex');
-                    resolve(encrypted);
+                    // Salvar o iv junto com o texto criptografado (em hex)
+                    const result = iv.toString('hex') + ':' + encrypted;
+                    resolve(result);
                 });
             });
         });
     }
 
+
     decryptString(encryptedData, password) {
-        // Use the async `crypto.scrypt()` instead.
+        const [ivHex, encryptedText] = encryptedData.split(':');
+        const iv = Buffer.from(ivHex, 'hex');
         const key = scryptSync(password, 'salt', 24);
-        // The IV is usually passed along with the ciphertext.
-        const iv = Buffer.alloc(16, 0); // Initialization vector.
         const decipher = createDecipheriv(algorithm, key, iv);
-        // Encrypted using same algorithm, key and iv.
-        let decrypted = decipher.update(encryptedData, 'hex', 'utf8');
+        let decrypted = decipher.update(encryptedText, 'hex', 'utf8');
         decrypted += decipher.final('utf8');
         return decrypted;
     }
+
 
     saveEncryptedData(filePath, encryptedData) {
         fs.writeFileSync(filePath, encryptedData, 'utf8');
