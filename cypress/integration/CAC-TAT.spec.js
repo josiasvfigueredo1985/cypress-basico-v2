@@ -112,7 +112,7 @@ describe('Central de Atendimento ao Cliente TAT', function () {
                 //Must use console.log to verify the input info with the inspector mode
                 console.log(input[0].files[0])
                 expect(input[0].files[0].name).to.equal('example.json')
-                expect(input[0].files[0].size).to.equal(155)
+                expect(input[0].files[0].size).to.equal(247)
                 expect(input[0].files[0].type).to.equal('application/json')
             })
     });
