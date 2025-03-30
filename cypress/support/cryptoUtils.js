@@ -8,24 +8,16 @@ import {
     scrypt,
     scryptSync
 } from 'crypto';
-import fs from 'fs';
+import path from 'path';
+import { FileUtils } from './fileUtils';
+
 
 const algorithm = 'aes-192-cbc';
 
-// CryptoHandler class for encryption and decryption
-export class CryptoHandler {
+// CryptoUtils class for encryption and decryption
+export class CryptoUtils {
 
     constructor() { }
-    readJsonFile(filePath) {
-        const jsonData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-        const plainText = JSON.stringify(jsonData);
-        return plainText;
-    }
-
-    readTextFile(filePath) {
-        const textData = fs.readFileSync(filePath, 'utf8');
-        return textData;
-    }
 
     encryptString(textData, password) {
         return new Promise((resolve, reject) => {
@@ -36,7 +28,6 @@ export class CryptoHandler {
                     const cipher = createCipheriv(algorithm, key, iv);
                     let encrypted = cipher.update(textData, 'utf8', 'hex');
                     encrypted += cipher.final('hex');
-                    // Salvar o iv junto com o texto criptografado (em hex)
                     const result = iv.toString('hex') + ':' + encrypted;
                     resolve(result);
                 });
@@ -56,7 +47,21 @@ export class CryptoHandler {
     }
 
 
-    saveEncryptedData(filePath, encryptedData) {
-        fs.writeFileSync(filePath, encryptedData, 'utf8');
+    async encryptLocalFiles(directoryPath, localFolder, password) {
+        const newFileExtension = '.txt'
+        const fileExtension = '.json'
+        // Read all files from not_encrypted folder
+        const fileNames = await FileUtils.listFileNames(path.join(directoryPath, localFolder));
+        // LOOP
+        for (const fileName of fileNames) {
+            const localFilePath = path.join(directoryPath, localFolder, fileName);
+            // Read json file
+            const jsonData = FileUtils.readJsonFile(localFilePath);
+            // Encrypt data
+            const encryptedData = await this.encryptString(jsonData, password);
+            // Save it into fixtures folder with same name, different extension
+            const ciFilePath = path.join(directoryPath, fileName.replace(fileExtension, newFileExtension));
+            FileUtils.saveFileWithData(ciFilePath, encryptedData)
+        }
     }
 }
