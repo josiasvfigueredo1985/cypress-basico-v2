@@ -1,3 +1,5 @@
+import 'cypress-localstorage-commands'
+
 
 Cypress.Commands.add('fillMandatoryFieldsAndSubmit', project => {
     cy.get('#firstName').should('be.visible').type('Josias', { delay: 0 })
@@ -17,7 +19,7 @@ Cypress.Commands.add('fillMandatoryFieldsAndSubmit2', (nome, lastname, email, hc
 
 
 Cypress.Commands.add('getDecryptedJsonData', (jsonName) => {
-    const password = Cypress.env('password');
+    const password = Cypress.env('crypto_password');
     const env = Cypress.env('current_env');
     const dirPath = Cypress.env('directoryPath');
     const localFolder = Cypress.env('localFolder');

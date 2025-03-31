@@ -4,4 +4,4 @@ cypress/downloads/
 cypress/screenshots/
 cypress/videos/
 cypress/fixtures/not_encrypted/
-cypress.env.json
+.env

@@ -25,10 +25,12 @@
   "license": "MIT",
   "homepage": "https://github.com/wlsf82/cypress-basico-v2#readme",
   "devDependencies": {
-    "cypress": "^9.5.1"
+    "cypress": "^12.17.4"
   },
   "dependencies": {
     "crypto-js": "^4.2.0",
+    "cypress-localstorage-commands": "^2.2.7",
+    "dotenv": "^16.4.7",
     "fs": "^0.0.1-security",
     "path": "^0.12.7"
   }
