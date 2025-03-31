@@ -27,4 +27,4 @@ jobs:
       - name: Run Cypress tests
         env:
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
-        run: npm run cypress:run # ou o comando que você usa para rodar os testes
+        run: npx cypress run # ou o comando que você usa para rodar os testes
