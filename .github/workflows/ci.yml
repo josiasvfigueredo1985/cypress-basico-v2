@@ -26,6 +26,6 @@ jobs:
 
       - name: Run Cypress tests
         env:
-          ENVIRONMENT: ${{ vars.ENVIRONMENT }}
+          ENVIRONMENT: 'CI'
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
         run: npx cypress run # ou o comando que você usa para rodar os testes
