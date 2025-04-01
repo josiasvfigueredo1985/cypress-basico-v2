@@ -26,12 +26,12 @@ jobs:
 
       - name: Print environment variables (debug)
         run: |
-          echo "ENVIRONMENT=${{ vars.ENVIRONMENT }}"
+          echo "ENVIRONMENT=${{ env.ENVIRONMENT }}"
           echo "SECRET_KEY=${{ secrets.SECRET_KEY }}"
 
       - name: Run Cypress tests
         env:
-          ENVIRONMENT: ${{ vars.ENVIRONMENT }}
+          ENVIRONMENT: ${{ env.ENVIRONMENT }}
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
         run: |
           npx cypress run --env ENVIRONMENT=$ENVIRONMENT,SECRET_KEY=$SECRET_KEY
