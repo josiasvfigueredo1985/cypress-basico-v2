@@ -29,4 +29,4 @@ jobs:
           ENVIRONMENT: ${{ vars.ENVIRONMENT }}
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
         run: |
-          npx cypress run --env ENVIRONMENT=${{ env.ENVIRONMENT }},SECRET_KEY=${{ secrets.SECRET_KEY  }}
+          npx cypress run --env ENVIRONMENT=$ENVIRONMENT,SECRET_KEY=$SECRET_KEY
