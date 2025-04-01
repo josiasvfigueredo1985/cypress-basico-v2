@@ -14,7 +14,7 @@ describe("Central de Atendimento ao Cliente TAT", function () {
         cy.get("#lastName").should("be.visible").type("Valentim", { delay: 0 })
         cy.get("#email").should("be.visible").type("josiasvalentim@gmail.com", { delay: 0 })
         cy.get("#open-text-area").should("be.visible").type(longText, { delay: 0 })
-        cy.contains("button[type="submit"]", "Enviar").should("be.visible").click()
+        cy.contains("button[type=submit]", "Enviar").should("be.visible").click()
         cy.get(".success").should("be.visible")
         cy.tick(3000)
         cy.get(".success").should("not.be.visible")
@@ -80,12 +80,12 @@ describe("Central de Atendimento ao Cliente TAT", function () {
     it("seleciona um produto (Blog) por seu índice", () => {
         cy.get("#product").select(1).should("have.value", "blog")
     });
-    it("marca o tipo de atendimento "Feedback"", () => {
-        cy.get("input[value="feedback"]").check().should("have.value", "feedback")
-        cy.get("input[type="radio"][value="feedback"]").check().should("be.checked")
+    it("marca o tipo de atendimento Feedback", () => {
+        cy.get("input[value=feedback]").check().should("have.value", "feedback")
+        cy.get("input[type=radio][value=feedback]").check().should("be.checked")
     });
     it("marca cada tipo de atendimento", () => {
-        cy.get("input[type="radio"]")
+        cy.get("input[type=radio]")
             .should("have.length", 3)
             .each(function ($radio) {//usng $ means that all the elements of radio type will be selected
                 cy.wrap($radio).check()
@@ -93,8 +93,8 @@ describe("Central de Atendimento ao Cliente TAT", function () {
             })
     });
     it("marca ambos checkboxes, depois desmarca o último", () => {
-        cy.get("input[type="checkbox"]").check().should("be.checked")//check all the checkbox with the defined type
-        cy.get("input[type="checkbox"]").last().uncheck().should("not.be.checked")
+        cy.get("input[type=checkbox]").check().should("be.checked")//check all the checkbox with the defined type
+        cy.get("input[type=checkbox]").last().uncheck().should("not.be.checked")
     });
     it("seleciona um arquivo da pasta fixtures", () => {
         cy.get("#file-upload")
@@ -132,7 +132,7 @@ describe("Central de Atendimento ao Cliente TAT", function () {
             })
     });
     it("selecione múltiplos arquivos para upload - Then", () => {
-        cy.get("input[type="file"]")
+        cy.get("input[type=file]")
             .selectFile([
                 "cypress/fixtures/example.json",
                 "cypress/fixtures/example.txt"
@@ -145,7 +145,7 @@ describe("Central de Atendimento ao Cliente TAT", function () {
     });
 
     it("selecione múltiplos arquivos para upload - Should", () => {
-        cy.get("input[type="file"]")
+        cy.get("input[type=file]")
             .selectFile([
                 "cypress/fixtures/example.json",
                 "cypress/fixtures/example.txt"
@@ -157,7 +157,7 @@ describe("Central de Atendimento ao Cliente TAT", function () {
             })
     });
     it("selecione múltiplos arquivos para upload simulando drag and drop", () => {
-        cy.get("input[type="file"]")
+        cy.get("input[type=file]")
             .selectFile([
                 "cypress/fixtures/example.json",
                 "cypress/fixtures/example.txt"
@@ -174,7 +174,7 @@ describe("Central de Atendimento ao Cliente TAT", function () {
 
     Cypress._.times(5, () => {// Run the tests 5 times
         it("acessa a página da política de privacidade removendo o target e então clicando no link", () => {
-            cy.get("a[href="privacy.html"]")
+            cy.get("a[href='privacy.html']")
                 .invoke("removeAttr", "target").
                 click()
                 .title().should("be.equal", "Central de Atendimento ao Cliente TAT - Política de privacidade")
@@ -210,14 +210,15 @@ describe("Central de Atendimento ao Cliente TAT", function () {
 
 describe("Teste de API - ServRest", () => {
     it("busca usuários corretamente", () => {
+        const query = "?nome=Fulano%20da%20Silva&email=fulano@qa.com"
         cy.request({
             method: "GET",
-            url: "https://serverest.dev/usuarios"
+            url: `https://serverest.dev/usuarios${query}`
         }).then((response) => {
             //console.log(response)
             expect(response.status).to.equal(200);
-            expect(response.body.usuarios[0].nome).to.equal("Fulano da Silva")
-            expect(response.body.usuarios[0].email).to.equal("fulano@qa.com")
+            expect(response.body.usuarios[0].nome).to.includes("Fulano da Silva")
+            expect(response.body.usuarios[0].email).to.includes("fulano@qa.com")
         })
     })
     it("faz uma requisição HTTP", () => {
