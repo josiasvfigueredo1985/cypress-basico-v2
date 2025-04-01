@@ -1,3 +1,4 @@
+# .github/workflows/ci.yml
 name: CI
 
 on:
@@ -11,7 +12,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -24,7 +25,7 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Print reopsitory variables (debug)
+      - name: Print repository variables (debug)
         run: |
           echo "Secret key is ${{ secrets.SECRET_KEY }}"
           echo "Env is ${{ vars.ENVIRONMENT }}"
