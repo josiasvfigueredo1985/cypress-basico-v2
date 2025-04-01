@@ -30,8 +30,8 @@ jobs:
 
       - name: Print environment variables (debug)
         run: |
-          echo: "Secret key is ${{secrets.SECRET_KEY}}"
-          echo: "Env is ${{vars.ENVIRONMENT}}"
+          echo "Secret key is ${{secrets.SECRET_KEY}}"
+          echo "Env is ${{vars.ENVIRONMENT}}"
           echo "ENVIRONMENT=$ENVIRONMENT"
           echo "SECRET_KEY=$SECRET_KEY"
 
