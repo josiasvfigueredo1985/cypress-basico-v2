@@ -1,9 +1,5 @@
 name: CI
 
-env:
-  ENVIRONMENT: ${{vars.ENVIRONMENT}}
-  SECRET_KEY: ${{secrets.SECRET_KEY}}
-
 on:
   push:
     branches:
@@ -36,5 +32,8 @@ jobs:
           echo "SECRET_KEY=$SECRET_KEY"
 
       - name: Run Cypress tests
+        env:
+          ENVIRONMENT: ${{ vars.ENVIRONMENT_NAME }}
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
         run: |
           npx cypress run --env ENVIRONMENT=$ENVIRONMENT,SECRET_KEY=$SECRET_KEY
