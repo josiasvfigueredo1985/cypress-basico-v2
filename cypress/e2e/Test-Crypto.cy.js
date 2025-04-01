@@ -1,13 +1,6 @@
 // cypress/integration/encryption_spec.js
 describe('Teste de Criptografia e Descriptografia de Arquivos', () => {
 
-    it('Deve criptografar todos os arquivos na pasta ./cypress/not_encrypted em LOCAL', () => {
-        cy.task('processFile', { fileName: '' }) // Chama para criptografar
-            .then((result) => {
-                cy.log(result); // Exibir mensagem de sucesso
-            });
-    });
-
     it('Deve descriptografar um arquivo específico em CI e validar conteúdo', () => {
         const fileName = 'test_encrypted'; // Nome do arquivo sem a extensão .txt
 

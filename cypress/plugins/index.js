@@ -1,4 +1,3 @@
-// cypress/plugins/index.js
 const fs = require('fs');
 const path = require('path');
 const CryptoJS = require('crypto-js');
@@ -6,15 +5,19 @@ const CryptoJS = require('crypto-js');
 module.exports = (on, config) => {
     on('task', {
         processFile({ fileName }) {
-            console.log('Configs    --->>>', config.env)
+            console.log('Configs    --->>>', config.env);
             const secretKey = config.env.SECRET_KEY;
-            const environment = config.env.ENVIRONMENT; // Ler o ambiente
+            const environment = config.env.ENVIRONMENT;
             const notEncryptedFolder = './cypress/not_encrypted';
             const encryptedFolder = './cypress/encrypted';
 
             return new Promise((resolve, reject) => {
-                if (environment === 'LOCAL' | environment === 'Test') {
-                    // Criptografar todos os arquivos na pasta ./cypress/not_encrypted
+                if (!secretKey) {
+                    return reject(new Error('❌ ERROR: SECRET_KEY is not defined!'));
+                }
+
+                if (environment === 'LOCAL' || environment === 'Test') {
+                    // Encrypt all files in the ./cypress/not_encrypted folder
                     fs.readdir(notEncryptedFolder, (err, files) => {
                         if (err) {
                             return reject(err);
@@ -29,24 +32,27 @@ module.exports = (on, config) => {
                                         return fileReject(readErr);
                                     }
 
-                                    // Criptografar os dados
-                                    const encryptedData = CryptoJS.AES.encrypt(data, secretKey).toString();
+                                    try {
+                                        // Encrypt data
+                                        const encryptedData = CryptoJS.AES.encrypt(data, secretKey).toString();
 
-                                    // Salvar os dados criptografados com o formato <nome_original>.txt
-                                    const outputFilePath = path.join(encryptedFolder, `${path.basename(file, path.extname(file))}.txt`);
-                                    fs.writeFile(outputFilePath, encryptedData, (writeErr) => {
-                                        if (writeErr) {
-                                            return fileReject(writeErr);
-                                        }
-                                        fileResolve(null);
-                                    });
+                                        // Save the encrypted file as <original_name>.txt
+                                        const outputFilePath = path.join(encryptedFolder, `${path.basename(file, path.extname(file))}.txt`);
+                                        fs.writeFile(outputFilePath, encryptedData, (writeErr) => {
+                                            if (writeErr) {
+                                                return fileReject(writeErr);
+                                            }
+                                            fileResolve(null);
+                                        });
+                                    } catch (encryptErr) {
+                                        return fileReject(encryptErr);
+                                    }
                                 });
                             });
                         });
 
                         Promise.all(encryptPromises)
                             .then(() => {
-                                // Após criptografar, descriptografar o arquivo fornecido (se houver)
                                 if (fileName) {
                                     const filePath = path.join(encryptedFolder, `${fileName}.txt`);
 
@@ -55,49 +61,59 @@ module.exports = (on, config) => {
                                             return reject(readErr);
                                         }
 
-                                        // Descriptografar os dados
-                                        const bytes = CryptoJS.AES.decrypt(encryptedData, secretKey);
-                                        const decryptedData = bytes.toString(CryptoJS.enc.Utf8);
-
                                         try {
-                                            // Retornar os dados em formato JSON
+                                            // Decrypt data
+                                            const bytes = CryptoJS.AES.decrypt(encryptedData, secretKey);
+                                            const decryptedData = bytes.toString(CryptoJS.enc.Utf8);
+
+                                            if (!decryptedData) {
+                                                throw new Error('Decryption failed. Check your SECRET_KEY!');
+                                            }
+
+                                            // Return JSON data
                                             const jsonData = JSON.parse(decryptedData);
                                             resolve(jsonData);
                                         } catch (jsonErr) {
-                                            reject(jsonErr);
+                                            reject(new Error(`❌ ERROR: Decryption failed. Invalid key or corrupted data! - ${jsonErr.message}`));
                                         }
                                     });
                                 } else {
-                                    resolve(`Todos os arquivos foram criptografados e salvos na pasta ${encryptedFolder}`);
+                                    resolve(`✅ All files have been encrypted and saved in ${encryptedFolder}`);
                                 }
                             })
-                            .catch((error) => {
-                                reject(error);
-                            });
+                            .catch((error) => reject(error));
                     });
                 } else if (environment === 'CI') {
-                    // Descriptografar o arquivo fornecido
+                    // Decrypt the requested file in CI environment
                     const filePath = path.join(encryptedFolder, `${fileName}.txt`);
 
                     fs.readFile(filePath, 'utf8', (readErr, encryptedData) => {
                         if (readErr) {
-                            return reject(readErr);
+                            return reject(new Error(`❌ ERROR: Failed to read file ${filePath} - ${readErr.message}`));
                         }
 
-                        // Descriptografar os dados
-                        const bytes = CryptoJS.AES.decrypt(encryptedData, secretKey);
-                        const decryptedData = bytes.toString(CryptoJS.enc.Utf8);
-
                         try {
-                            // Retornar os dados em formato JSON
+                            console.log("🔍 Encrypted Data:", encryptedData);
+
+                            // Decrypt data
+                            const bytes = CryptoJS.AES.decrypt(encryptedData, secretKey);
+                            const decryptedData = bytes.toString(CryptoJS.enc.Utf8);
+
+                            if (!decryptedData) {
+                                throw new Error("Decryption failed. Check your SECRET_KEY!");
+                            }
+
+                            console.log("✅ Decryption successful!");
+
+                            // Parse and return JSON data
                             const jsonData = JSON.parse(decryptedData);
                             resolve(jsonData);
-                        } catch (jsonErr) {
-                            reject(jsonErr);
+                        } catch (error) {
+                            reject(new Error(`❌ ERROR: Decryption failed. Invalid key or corrupted data! - ${error.message}`));
                         }
                     });
                 } else {
-                    reject(new Error(`Ambiente ${environment} não suportado.`));
+                    reject(new Error(`❌ ERROR: Environment ${environment} is not supported.`));
                 }
             });
         },
