@@ -31,5 +31,8 @@
   },
   "dependencies": {
     "cypress-localstorage-commands": "^2.2.7"
+  },
+  "bugs": {
+    "url": "https://github.com/wlsf82/cypress-basico-v2/issues"
   }
 }
