@@ -24,6 +24,11 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Print environment variables (debug)
+        run: |
+          echo "ENVIRONMENT=${{ vars.ENVIRONMENT }}"
+          echo "SECRET_KEY=${{ secrets.SECRET_KEY }}"
+
       - name: Run Cypress tests
         env:
           ENVIRONMENT: ${{ vars.ENVIRONMENT }}
