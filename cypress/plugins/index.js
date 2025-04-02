@@ -35,7 +35,7 @@ module.exports = (on, config) => {
     const decryptData = (encryptedData, secretKey) => {
         const bytes = CryptoJS.AES.decrypt(encryptedData, secretKey);
         const decryptedData = bytes.toString(CryptoJS.enc.Utf8);
-        if (!decryptedData) {
+        if (!decryptedData || decryptedData === "") {
             throw new Error('Decryption failed. Check your SECRET_KEY!');
         }
         return JSON.parse(decryptedData);
