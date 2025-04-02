@@ -23,6 +23,10 @@ module.exports = (on, config) => {
                             return reject(err);
                         }
                         let encryptPromises = []
+
+                        encrypt ? console.log(`Encryption on ${environment} started...`) : console.log(`Encryption on ${environment} skipped, decrypting started...`);
+                        // Conditional for Local Tests, it allows to run encrypting according encrypt flag, if false, it will not encrypt files
+                        // and just reads and decrypt the already encrypted files, otherwise proceeds with encrypting steps.
                         if (encrypt) {
                             encryptPromises = files.map((file) => {
                                 return new Promise((fileResolve, fileReject) => {
@@ -55,6 +59,8 @@ module.exports = (on, config) => {
 
                         Promise.all(encryptPromises)
                             .then(() => {
+                                console.log(`Encryption on ${environment} started...`);
+
                                 if (fileName) {
                                     const filePath = path.join(encryptedFolder, `${fileName}.txt`);
 
@@ -88,6 +94,7 @@ module.exports = (on, config) => {
                 } else if (environment === 'CI') {
                     // Decrypt the requested file in CI environment
                     const filePath = path.join(encryptedFolder, `${fileName}.txt`);
+                    console.log(`Decryption on ${environment} started...`);
 
                     fs.readFile(filePath, 'utf8', (readErr, encryptedData) => {
                         if (readErr) {
