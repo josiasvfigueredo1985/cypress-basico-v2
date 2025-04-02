@@ -1,3 +1,5 @@
+import { faker } from '@faker-js/faker';
+
 describe("Central de Atendimento ao Cliente TAT", function () {
     //beforeEach(() => cy.visit("./src/index.html"))
     //Another semantic
@@ -209,16 +211,33 @@ describe("Central de Atendimento ao Cliente TAT", function () {
 })
 
 describe("Teste de API - ServRest", () => {
+    const user = faker.person.fullName();
+    const email = faker.internet.email();
+
+    before('Cria novo usuário', () => {
+        cy.request({
+            method: "POST",
+            url: "https://serverest.dev/usuarios",
+            body: {
+                "nome": user,
+                "email": email,
+                "password": "teste",
+                "administrador": "true"
+            }
+        }).then((response) => {
+            cy.log(response)
+        })
+    })
     it("busca usuários corretamente", () => {
-        const query = "?nome=Fulano%20da%20Silva&email=fulano@qa.com"
+        const query = `?nome=${user}&email=${email}`
         cy.request({
             method: "GET",
             url: `https://serverest.dev/usuarios${query}`
         }).then((response) => {
             //console.log(response)
             expect(response.status).to.equal(200);
-            expect(response.body.usuarios[0].nome).to.includes("Fulano da Silva")
-            expect(response.body.usuarios[0].email).to.includes("fulano@qa.com")
+            expect(response.body.usuarios[0].nome).to.includes(user)
+            expect(response.body.usuarios[0].email).to.includes(email)
         })
     })
     it("faz uma requisição HTTP", () => {
