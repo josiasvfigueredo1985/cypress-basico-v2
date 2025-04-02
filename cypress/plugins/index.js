@@ -4,7 +4,7 @@ const CryptoJS = require('crypto-js');
 
 module.exports = (on, config) => {
     on('task', {
-        processFile({ fileName, encrypt = true  }) {
+        processFile({ fileName, encrypt = true }) {
             console.log('Configs    --->>>', config.env);
             const secretKey = config.env.SECRET_KEY;
             const environment = config.env.ENVIRONMENT;
@@ -16,40 +16,42 @@ module.exports = (on, config) => {
                     return reject(new Error('❌ ERROR: SECRET_KEY is not defined!'));
                 }
 
-                if (environment === 'LOCAL' || environment === 'Test' || encrypt) {
+                if (environment === 'LOCAL' || environment === 'Test') {
                     // Encrypt all files in the ./cypress/not_encrypted folder
                     fs.readdir(notEncryptedFolder, (err, files) => {
                         if (err) {
                             return reject(err);
                         }
+                        let encryptPromises = []
+                        if (encrypt) {
+                            encryptPromises = files.map((file) => {
+                                return new Promise((fileResolve, fileReject) => {
+                                    const filePath = path.join(notEncryptedFolder, file);
 
-                        const encryptPromises = files.map((file) => {
-                            return new Promise((fileResolve, fileReject) => {
-                                const filePath = path.join(notEncryptedFolder, file);
+                                    fs.readFile(filePath, 'utf8', (readErr, data) => {
+                                        if (readErr) {
+                                            return fileReject(readErr);
+                                        }
 
-                                fs.readFile(filePath, 'utf8', (readErr, data) => {
-                                    if (readErr) {
-                                        return fileReject(readErr);
-                                    }
+                                        try {
+                                            // Encrypt data
+                                            const encryptedData = CryptoJS.AES.encrypt(data, secretKey).toString();
 
-                                    try {
-                                        // Encrypt data
-                                        const encryptedData = CryptoJS.AES.encrypt(data, secretKey).toString();
-
-                                        // Save the encrypted file as <original_name>.txt
-                                        const outputFilePath = path.join(encryptedFolder, `${path.basename(file, path.extname(file))}.txt`);
-                                        fs.writeFile(outputFilePath, encryptedData, (writeErr) => {
-                                            if (writeErr) {
-                                                return fileReject(writeErr);
-                                            }
-                                            fileResolve(null);
-                                        });
-                                    } catch (encryptErr) {
-                                        return fileReject(encryptErr);
-                                    }
+                                            // Save the encrypted file as <original_name>.txt
+                                            const outputFilePath = path.join(encryptedFolder, `${path.basename(file, path.extname(file))}.txt`);
+                                            fs.writeFile(outputFilePath, encryptedData, (writeErr) => {
+                                                if (writeErr) {
+                                                    return fileReject(writeErr);
+                                                }
+                                                fileResolve(null);
+                                            });
+                                        } catch (encryptErr) {
+                                            return fileReject(encryptErr);
+                                        }
+                                    });
                                 });
                             });
-                        });
+                        }
 
                         Promise.all(encryptPromises)
                             .then(() => {
