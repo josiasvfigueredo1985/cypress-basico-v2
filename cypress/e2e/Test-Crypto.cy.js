@@ -19,7 +19,7 @@ describe('Teste de Criptografia e Descriptografia de Arquivos', () => {
             .then((jsonData) => {
                 expect(jsonData).to.exist; // Verifica se os dados existem
                 expect(jsonData).to.have.property('name', 'John Doe'); // Valida se um campo é igual ao esperado
-                expect(jsonData).to.have.property('age', 35); // Valida se um campo é igual ao esperado
+                expect(jsonData).to.have.property('age', 35); // Valida se  um campo é igual ao esperado
                 cy.log(JSON.stringify(jsonData)); // Exibir os dados JSON
             });
     });
