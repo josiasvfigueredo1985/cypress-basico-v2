@@ -4,7 +4,7 @@ const CryptoJS = require('crypto-js');
 
 module.exports = (on, config) => {
     on('task', {
-        processFile({ fileName }) {
+        processFile({ fileName, encrypt = true  }) {
             console.log('Configs    --->>>', config.env);
             const secretKey = config.env.SECRET_KEY;
             const environment = config.env.ENVIRONMENT;
@@ -16,7 +16,7 @@ module.exports = (on, config) => {
                     return reject(new Error('❌ ERROR: SECRET_KEY is not defined!'));
                 }
 
-                if (environment === 'LOCAL' || environment === 'Test') {
+                if (environment === 'LOCAL' || environment === 'Test' || encrypt) {
                     // Encrypt all files in the ./cypress/not_encrypted folder
                     fs.readdir(notEncryptedFolder, (err, files) => {
                         if (err) {
